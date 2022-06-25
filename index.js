@@ -108,14 +108,14 @@ app.post('/user/cadastro' , async (req, res)=> {
 
 
     //RECEBENDO VALORES INFORMAS NO BODY(FRONTEND) REFERENCIADOS COM NAME PARA SEREM RECEBIDOS COM req.body.campoDesejao
-    const {nome, cpf, telefone, sexo, email, senha, usuario, numero, cidade, uf, cep, rua, bairro } = req.body
+    const {nome, cpf, telefone, sexo, email, senha, usuario} = req.body
 
     //INSERE DADOS NA TABELA CLIENTE
     const sql = `INSERT INTO cliente(nome, cpf, telefone, sexo, email, usuario, senha) VALUES('${nome}','${cpf}','${telefone}','${sexo}','${email}','${usuario}','${senha}')`;
     
    
     //GRAVA OS DADOS NA RESPECTIVAS TABELAS CLIENTE E CLIENTE_END
-    return await conn.query(sql) && res.json({message:"CADASTRO EFETUADO"})            
+    return await conn.query(sql) && res.redirect('http://localhost:3000/cadastroEndereco') &&  res.json({message:"CADASTRO EFETUADO"})            
     
 });
 
@@ -200,6 +200,12 @@ app.post('/user/veiculo/cadastro' , async (req, res)=> {
 });
 
 //ALTERA UM VEICULO REFERENTE AO USUARIO 
+app.get('/user/veiculo/alterar' , async (req, res)=> {
+  
+  return await res.redirect('http://localhost:3000/cadastroEndereco')
+
+});
+
 app.put('/user/veiculo/atualiza' , async (req, res)=> {
     const conn = await conecta(); //CONECTANDO AO BANDO DE DADOS
     const sessao = await logado(); //IMPORTANDO DADOS DO USUARIO LOGADO
@@ -216,7 +222,7 @@ app.put('/user/veiculo/atualiza' , async (req, res)=> {
 });
 
 //DELETA UM VEICULO REFERENTE AO USUARIO CADASTRADOe E ID DO VEICULO SELECIONADO
-app.delete('/user/veiculo/deletar' , async (req, res)=> {
+app.post('/user/veiculo/deletar' , async (req, res)=> {
     const conn = await conecta(); //CONECTANDO AO BANDO DE DADOS
     const sessao = await logado(); //IMPORTANDO DADOS DO USUARIO LOGADO
     const id = sessao.idcliente; //ATRIBUINDO O ID DO USUARIO LOGADO A VARIAVEL ID
@@ -264,40 +270,23 @@ app.get('/viagem/exibir', async (req,res)=>{
   sessao = await logado()
   const id = sessao.idcliente;
 
-  const [viagem] = await conn.query(`SELECT *FROM viagem where viagem_idcliente = '${id}'`);
+  const [viagem] = await conn.query(` 
+  select horario, data,espaco, kg_max, valor_km, id_viagem,
+  veiculo, marca,imagem, ano, modelo, placa, id_veiculo,
+  cidade_origem,
+  cidade_destino, 
+  nome, telefone, email from viagem vi
+inner join veiculo ve on vi.veiculo_id_veiculo = ve.id_veiculo
+inner join origem_carga oc on vi.id_viagem = oc.viagem_id
+inner join destino_carga dc on vi.id_viagem = dc.viagem_id
+inner join cliente cl on vi.viagem_idcliente = cl.idcliente
+where vi.viagem_idcliente = '${id}'`);
   
-
-  for(let i = 0; i < viagem.length; i++) {
-     
-       viagem2 = await viagem[i]
-       
+console.log(viagem)
   
-       const [exibirViagem] = await conn.query(`SELECT 
-       viagem.horario, viagem.data, viagem.espaco, viagem.kg_max, viagem.valor_km, 
-       veiculo.veiculo, veiculo.marca, veiculo.imagem, veiculo.ano, veiculo.modelo, veiculo.placa,
-       origem_carga.cidade_origem,
-       destino_carga.cidade_destino, 
-       cliente.nome, cliente.telefone, cliente.email
-     
-       FROM viagem INNER JOIN veiculo
-       ON '${viagem2.veiculo_id_veiculo}' = veiculo.id_veiculo 
-       INNER JOIN origem_carga
-       ON '${viagem2.id_viagem}' = origem_carga.viagem_id 
-       INNER JOIN destino_carga
-       ON '${viagem2.id_viagem}' = destino_carga.viagem_id
-       INNER JOIN cliente
-       ON '${viagem2.viagem_idcliente}' = cliente.idcliente`)
+   
 
-       for(let j = 0; j < exibirViagem.length; j++) {
-     
-        exibirViagem2 = await exibirViagem[j]
-
-       console.log(exibirViagem2)
-   //GRAVA OS DADOS NA RESPECTIVAS TABELAS DESTINO E ORIGEM
-   return await res.json(exibirViagem2)  
-       }
-  }
-  
+   return await res.json(viagem)  
   
 })
 
@@ -363,7 +352,7 @@ app.post('/viagem/cadastro/rota' , async (req, res)=> {
   }
 });
 
-app.delete('/user/viagem/deletar' , async (req, res)=> {
+app.post('/user/viagem/deletar' , async (req, res)=> {
   const conn = await conecta(); //CONECTANDO AO BANDO DE DADOS
   const sessao = await logado(); //IMPORTANDO DADOS DO USUARIO LOGADO
   const id = sessao.idcliente; //ATRIBUINDO O ID DO USUARIO LOGADO A VARIAVEL ID
@@ -372,7 +361,7 @@ app.delete('/user/viagem/deletar' , async (req, res)=> {
   //SELECIONA VIAGEM A SER DELETADA
   const sql = `DELETE FROM viagem WHERE viagem_idcliente = '${id}' and id_viagem = ${viagem}`;
   //EXECUTA O DELETE NA TABELA VIAGEM
-  return await conn.query(sql) && res.json({mensagem: "viagem excluida com sucesso" });
+  return await conn.query(sql) && res.redirect('http://localhost:3000/viagens') && res.json({mensagem: "viagem excluida com sucesso" });
 
 });
 
