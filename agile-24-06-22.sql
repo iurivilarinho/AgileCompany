@@ -60,10 +60,9 @@ CREATE TABLE IF NOT EXISTS `mydb`.`viagem` (
   `viagem_idcliente` INT NOT NULL,
   `horario` VARCHAR(45) NOT NULL,
   `data` VARCHAR(45) NOT NULL,
-  `peso` VARCHAR(45) NOT NULL,
   `espaco` VARCHAR(45) NOT NULL,
   `kg_max` VARCHAR(45) NOT NULL,
-  `valo_km` VARCHAR(45) NOT NULL,
+  `valor_km` VARCHAR(45) NOT NULL,
   `distancia_perc` VARCHAR(45) NOT NULL,
   `veiculo_id_veiculo` INT NOT NULL,
   PRIMARY KEY (`id_viagem`),
@@ -82,11 +81,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `mydb`.`origem_carga` (
   `id_origem_carga` INT NOT NULL AUTO_INCREMENT,
   `viagem_id` INT NOT NULL,
-  `cep` VARCHAR(10) NOT NULL,
-  `uf` VARCHAR(2) NOT NULL,
-  `cidade` VARCHAR(50) NOT NULL,
-  `bairro` VARCHAR(45) NOT NULL,
-  `rua` VARCHAR(45) NOT NULL,
+  `cidade_origem` VARCHAR(50) NOT NULL,
   PRIMARY KEY (`id_origem_carga`),
   CONSTRAINT `fk_viagem_origem`
     FOREIGN KEY (`viagem_id`)
@@ -124,12 +119,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `mydb`.`destino_carga` (
   `id_destino_carga` INT NOT NULL AUTO_INCREMENT,
   `viagem_id` INT NOT NULL,
-  `cep` VARCHAR(10) NOT NULL,
-  `uf` VARCHAR(2) NOT NULL,
-  `cidade` VARCHAR(50) NOT NULL,
-  `bairro` VARCHAR(45) NOT NULL,
-  `rua` VARCHAR(45) NOT NULL,
-  `numero` VARCHAR(6) NOT NULL,
+  `cidade_destino` VARCHAR(50) NOT NULL,
   INDEX `fk_destino_carga_viagem1_idx` (`viagem_id` ASC) ,
   PRIMARY KEY (`id_destino_carga`),
   CONSTRAINT `fk_destino_carga_viagem1`
