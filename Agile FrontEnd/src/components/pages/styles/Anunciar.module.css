@@ -1,0 +1,90 @@
+:root{
+    --Branco:#ffffff;
+    --Preto:#000000;
+    --BackgroundCard: #717171;
+    --BackgroundSite:#C4C4C4;
+    --Primaria-V:#633646;
+    --Primaria-L:#F3A32A;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-color: var(--BackgroundSite);
+    color: var(--Branco);
+}
+
+.cardRegister{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px;
+}
+.titulo{
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+.item{
+    padding: 5px;
+      background-color: var(--BackgroundCard);
+      border-bottom: #000000 solid 1.5px;
+      border-radius: 5px; 
+      margin: 10px;
+      width: max-content;
+  }
+  .item svg{
+      color: var(--Branco);
+      margin: 0px 10px;
+      font-size: 0.8em;
+  }
+  .cardRegister form{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+  }
+.cardRegister input{
+    background-color: var(--BackgroundCard);
+    border: none;
+    outline: none;
+    font-size: 18px;
+    color: var(--Branco);
+}
+.cardRegister select{
+    background-color: var(--BackgroundCard);
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: var(--Branco);
+    margin-left: 5px;
+    justify-content: center;
+}
+
+.cardRegister input::placeholder{
+    color: var(--Branco);
+    font-size: 16px;
+}
+
+/* botão de registrar */
+.register input{
+    background-color: var(--Primaria-L);
+    margin-top: 20px;
+    color: var(--Branco);
+    padding: 7px 50px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+}
+/* linhas */
+.linha{
+    display: flex;
+}
+.options input{
+    display: none;
+}

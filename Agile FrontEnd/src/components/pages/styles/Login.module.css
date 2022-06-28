@@ -1,0 +1,125 @@
+:root{
+    --Branco:#ffffff;
+    --Preto:#000000;
+    --BackgroundCard: #717171;
+    --BackgroundSite:#C4C4C4;
+    --Primaria-V:#633646;
+    --Primaria-L:#F3A32A;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-color: var(--BackgroundSite);
+    color: var(--Branco);
+}
+/* card Principal */
+.cardPrincipal{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--Primaria-V);
+    margin: 30px 60px;
+    border-radius: 20px;
+    box-shadow: 5px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* card lado imagem */
+.cardImage{
+    background-color: var(--BackgroundSite);
+    border-radius: 20px;
+    box-shadow: 5px 5px rgba(0, 0, 0, 0.15);
+    margin: 15px;
+    padding: 10px;
+    height: 80vh;
+    width: 25vw;
+}
+.imageBackground{
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    border-radius: 20px;
+    background-image:  linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.25)100%), url(/src/assets/caminhaoEst.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100%;
+    width: 100%;
+}
+.cardImage img{
+    max-width: 200px;
+}
+
+/* card lado login */
+.cardLogin{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin: 15px 100px 15px 100px;
+}
+.titulo{
+    font-size: 30px;
+}
+.subtitulo{
+    margin-bottom: 80px;
+}
+.item{
+    padding: 5px;
+      background-color: var(--Primaria-V);
+      border-bottom: #000000 solid 1.5px;
+      border-radius: 5px;
+      margin-top: 10px;  
+  }
+  .item svg{
+      color: var(--BackgroundSite);
+      margin-right: 10px;
+      font-size: 0.8em;
+  }
+  .cardLogin form{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+  }
+.cardLogin input{
+    background-color: var(--Primaria-V);
+    border: none;
+    outline: none;
+    font-size: 18px;
+    color: var(--BackgroundSite);
+}
+.cardLogin input::placeholder{
+    color: var(--BackgroundSite);
+    font-size: 16px;
+}
+
+/* pergunta de cadastro */
+.quest {
+    margin-top: 80px;
+    font-size: 14px;
+}
+.quest span{
+    font-weight: 600;
+    font-size: 16px;
+}
+.quest a{
+    text-decoration: none;
+    color: var(--Branco);
+}
+
+/* botão de entrar */
+.sign input{
+    background-color: var(--Primaria-L);
+    margin-top: 40px;
+    color: var(--Branco);
+    padding: 7px 50px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+}

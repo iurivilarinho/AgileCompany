@@ -3,7 +3,8 @@ const bodyparser = require('body-parser') //IMPORTANDO O BODY-PARSER
 const app = express() //ATRIBUINDO O EXPRESS A VARIAVEL APP
 const port = 5000; //DEFININDO EM QUAL PORTA IRA RODAR O SERVIDOR
 const axios = require('axios');
-const cors = require('cors')
+const cors = require('cors');
+const { json } = require('express/lib/response');
 //const { query } = require('express');
 
 
@@ -50,7 +51,7 @@ app.post('/login', async (req, res)=>{
        })
       
     }console.log("logado")
-     return res.redirect('http://localhost:3000/viagens') && res.json({message:"ok"})
+     return res.redirect('http://localhost:3000/') && res.json({message:"ok"})
     
 
   } 
@@ -92,8 +93,9 @@ app.get('/user', async function (req, res) {
 });
 
 // CONSULTA USUARIOS POR ID
-app.get('/user/:id',async (req, res)=>{
-    const {id} = req.params; 
+app.get('/user/logado',async (req, res)=>{
+    const sessao = await logado();
+    const id = sessao.idcliente;
     const conn  = await conecta(); //CONECTANDO AO BANDO DE DADOS
     //SELECIONA CLIENTE REFERENTE AO ID INFORMADO
     const [cliente] = await conn.query(`SELECT * FROM cliente WHERE idcliente = '${id}'`)
@@ -108,14 +110,14 @@ app.post('/user/cadastro' , async (req, res)=> {
 
 
     //RECEBENDO VALORES INFORMAS NO BODY(FRONTEND) REFERENCIADOS COM NAME PARA SEREM RECEBIDOS COM req.body.campoDesejao
-    const {nome, cpf, telefone, sexo, email, senha, usuario} = req.body
+    const {nome, cpf, telefone, sexo, email, senha, usuario, imagem_cliente} = req.body
 
     //INSERE DADOS NA TABELA CLIENTE
-    const sql = `INSERT INTO cliente(nome, cpf, telefone, sexo, email, usuario, senha) VALUES('${nome}','${cpf}','${telefone}','${sexo}','${email}','${usuario}','${senha}')`;
+    const sql = `INSERT INTO cliente(nome, cpf, telefone, sexo, email, usuario, senha, imagem_cliente) VALUES('${nome}','${cpf}','${telefone}','${sexo}','${email}','${usuario}','${senha}','${imagem_cliente}')`;
     
    
     //GRAVA OS DADOS NA RESPECTIVAS TABELAS CLIENTE E CLIENTE_END
-    return await conn.query(sql) && res.redirect('http://localhost:3000/cadastroEndereco') &&  res.json({message:"CADASTRO EFETUADO"})            
+    return await conn.query(sql) && res.redirect('http://localhost:3000/login') &&  res.json({message:"CADASTRO EFETUADO"})            
     
 });
 
@@ -133,7 +135,7 @@ app.post('/user/cadastro/endereco' , async (req, res)=> {
   const sql = `INSERT INTO end_cliente(cidade,uf, cep, bairro, numero, rua, cliente_id) VALUES('${cidade}','${uf}','${cep}','${bairro}','${numero}','${rua}', '${id}')`;
   
   //GRAVA OS DADOS NA TABELA CLIENTE_END
-  return await conn.query(sql) && res.json({message:"CADASTRO EFETUADO"})            
+  return await conn.query(sql) && res.redirect('http://localhost:3000/') && res.json({message:"CADASTRO EFETUADO"})            
   
 });
 
@@ -165,10 +167,9 @@ app.delete('/user/:id' , async (req, res)=> {
     //EXECUTA O DELETE NA TABELA CLIENTE
     return await conn.query(sql) && res.json({mensagem: "Cliente excluido com sucesso" })
     
-
 });
 
-//METODOS VEICULO____________________________________________________________________________________
+//METODOS VEICULO______________________________
 
 //CONSULTA VEICULO DO USUARIO LOCAL
 app.get('/user/veiculo/consulta', async function (req, res) {
@@ -194,7 +195,7 @@ app.post('/user/veiculo/cadastro' , async (req, res)=> {
     //SELECIONA  TABELA VEICULO PARA INSERÇÃO DE NOVO VEICULO DO USUARIO
     const sql = `INSERT INTO veiculo(veiculo, marca, ano, placa, modelo, imagem, cliente_idcliente) VALUES('${veiculo}','${marca}','${ano}','${placa}','${modelo}','${imagem}','${id}')`;
     //EXECUTA O UPDATE NA TABELA VEICULO
-    return await conn.query(sql) && res.json({mensagem: "Cadastro de Veiculo Efetuado!" });
+    return await conn.query(sql) && res.redirect('http://localhost:3000/veiculos') && res.json({mensagem: "Cadastro de Veiculo Efetuado!" });
             
 
 });
@@ -202,11 +203,11 @@ app.post('/user/veiculo/cadastro' , async (req, res)=> {
 //ALTERA UM VEICULO REFERENTE AO USUARIO 
 app.get('/user/veiculo/alterar' , async (req, res)=> {
   
-  return await res.redirect('http://localhost:3000/cadastroEndereco')
+  return await res.redirect('http://localhost:3000/alterarVeiculo')
 
 });
 
-app.put('/user/veiculo/atualiza' , async (req, res)=> {
+app.post('/user/veiculo/atualiza' , async (req, res)=> {
     const conn = await conecta(); //CONECTANDO AO BANDO DE DADOS
     const sessao = await logado(); //IMPORTANDO DADOS DO USUARIO LOGADO
     const id = sessao.idcliente; //ATRIBUINDO O ID DO USUARIO LOGADO A VARIAVEL ID
@@ -215,9 +216,10 @@ app.put('/user/veiculo/atualiza' , async (req, res)=> {
     const {id_veiculo, veiculo, marca, ano, placa, modelo, imagem} = req.body
 
     //SELECIONA  TABELA VEICULO PARA ALTERAÇÃO DO VEICULO DO USUARIO
-    const sql = `UPDATE veiculo SET veiculo = '${veiculo}', marca = '${marca}', ano = '${ano}', placa = '${placa}', modelo = '${modelo}', imagem = '${imagem}' where cliente_idcliente = '${id} AND id_veiculo = '${id_veiculo}'`;
+    const sql = `UPDATE veiculo SET veiculo = '${veiculo}', marca = '${marca}', ano = '${ano}', placa = '${placa}', modelo = '${modelo}', imagem = '${imagem}' where cliente_idcliente = '${id}' AND id_veiculo = '${id_veiculo}'`;
+    console.log(id_veiculo, id)
     //EXECUTA A ALTERAÇÃO NA TABELA VEICULO
-    return await conn.query (sql) && res.json({mensagem: "Ateração concluida" });
+    return await conn.query (sql) && res.redirect('http://localhost:3000/veiculos') && res.json({mensagem: "Ateração concluida" });
 
 });
 
@@ -231,7 +233,7 @@ app.post('/user/veiculo/deletar' , async (req, res)=> {
     //SELECIONA USUARIO A SER DELETADO
     const sql = `DELETE FROM veiculo WHERE cliente_idcliente = '${id}' and id_veiculo = ${veiculo}`;
     //EXECUTA O DELETE NA TABELA VEICULO
-    return await conn.query(sql) && res.json({mensagem: "veiculo excluido com sucesso" });
+    return await conn.query(sql) && res.redirect('http://localhost:3000/veiculos') && res.json({mensagem: "veiculo excluido com sucesso" });
 
 });
 
@@ -241,7 +243,7 @@ app.listen(port, () => {
     console.log(`Exemplo app node rodando no endereço http://localhost:${port}`);
 });
 
-//ROTAS VIAGEM ____________________________________________________________________________________________________
+//ROTAS VIAGEM __________________________________
 
 //ENVIA OS VEICULOS PARA A TELA DE CADASTRO PARA O USUARIO SELECIONAR
 app.get('/viagem/cadastro', async (req,res)=>{
@@ -277,8 +279,6 @@ app.get('/viagem/exibir', async (req,res)=>{
   cidade_destino, 
   nome, telefone, email from viagem vi
 inner join veiculo ve on vi.veiculo_id_veiculo = ve.id_veiculo
-inner join origem_carga oc on vi.id_viagem = oc.viagem_id
-inner join destino_carga dc on vi.id_viagem = dc.viagem_id
 inner join cliente cl on vi.viagem_idcliente = cl.idcliente
 where vi.viagem_idcliente = '${id}'`);
   
@@ -298,60 +298,20 @@ app.post('/viagem/cadastro' , async (req, res)=> {
   const sessao = await logado(); //IMPORTANDO DADOS DO USUARIO LOGADO
   const id = sessao.idcliente; //ATRIBUINDO O ID DO USUARIO LOGADO A VARIAVEL ID
 
-    //MODELO PARA CADASTRAR VEICULO SELECIONADO
-
-    // const veiculo_selecionado = req.body.veiculo_selecionado;
-
-    // const [veic_select] = await conn.query(`SELECT * FROM VEICULO id_veiculo where veiculo = '${veiculo_selecionado}'`) 
-
-    //   for(let i = 0; i < veic_select.length; i++) {
-       
-    //     veic_select2 = veic_select[i]
-      
-    // }
-
   //RECEBENDO VALORES INFORMAS NO BODY(FRONTEND) REFERENCIADOS COM NAME PARA SEREM RECEBIDOS COM req.body.campoDesejao
-  const {horario_partida, data_partida, kg_max, espaco, km_percorrido,valor_km } = req.body //tabela viagem
+  const {horario_partida, data_partida, kg_max, espaco, km_percorrido,valor_km, veiculo, cidade_origem, cidade_destino} = req.body //tabela viagem
 
-  const veic_select2 = 1;
-
+console.log(horario_partida, data_partida, kg_max, espaco, km_percorrido,valor_km, veiculo, cidade_origem, cidade_destino)
   //INSERE DADOS NA TABELA VIAGEM
-  const sql = `INSERT INTO viagem(viagem_idcliente, horario, data, espaco, kg_max, valor_km, distancia_perc, veiculo_id_veiculo) VALUES('${id}','${horario_partida}','${data_partida}','${espaco}','${kg_max}','${valor_km}','${km_percorrido}','${veic_select2}')`;
+  const sql = `INSERT INTO viagem(viagem_idcliente, horario, data, espaco, kg_max, valor_km, distancia_perc, veiculo_id_veiculo, cidade_origem, cidade_destino) VALUES('${id}','${horario_partida}','${data_partida}','${espaco}','${kg_max}','${valor_km}','${km_percorrido}','${veiculo}','${cidade_origem}','${cidade_destino}')`;
 
   //GRAVA OS DADOS NA RESPECTIVAS TABELAS CLIENTE E CLIENTE_END
-  return await conn.query(sql) && res.json({message:"CADASTRO EFETUADO"})            
+  return await conn.query(sql) && res.redirect('http://localhost:3000/') && res.json({message:"CADASTRO EFETUADO"})            
 
 });
+
 
 //CADASTRA ORIGEM E DESTINO DA VIAGEM
-app.post('/viagem/cadastro/rota' , async (req, res)=> {
-  
-  const conn = await conecta();//CONECTANDO AO BANDO DE DADOS
-  const sessao = await logado(); //IMPORTANDO DADOS DO USUARIO LOGADO
-  const id = sessao.idcliente; //ATRIBUINDO O ID DO USUARIO LOGADO A VARIAVEL ID
-
-  //RECEBENDO VALORES INFORMAS NO BODY(FRONTEND) REFERENCIADOS COM NAME PARA SEREM RECEBIDOS COM req.body.campoDesejao
-  const { cidade_partida, cidade_destino} = req.body //tabela origem e destino
-
-  const [viagem] = await conn.query(`SELECT id_viagem FROM viagem where viagem_idcliente = '${id}' ORDER BY id_viagem DESC LIMIT 1`);
-  
-
-  for(let i = 0; i < viagem.length; i++) {
-     
-       viagem2 = await viagem[i]
-       
-       //INSERE DADOS NA TABELA ORIGEM
-   const sql = `INSERT INTO origem_carga(viagem_id, cidade_origem) VALUES('${viagem2.id_viagem}','${cidade_partida}')`;
-
-  //INSERE DADOS NA TABELA DESTINO
-   const sql2 = `INSERT INTO destino_carga(viagem_id, cidade_destino) VALUES('${viagem2.id_viagem}','${cidade_destino}')`;
-
-   //GRAVA OS DADOS NA RESPECTIVAS TABELAS DESTINO E ORIGEM
-   return await conn.query(sql) && conn.query(sql2) && res.json({message:"CADASTRO DE ROTAS EFETUADO"})  
-       
-  }
-});
-
 app.post('/user/viagem/deletar' , async (req, res)=> {
   const conn = await conecta(); //CONECTANDO AO BANDO DE DADOS
   const sessao = await logado(); //IMPORTANDO DADOS DO USUARIO LOGADO
@@ -361,7 +321,47 @@ app.post('/user/viagem/deletar' , async (req, res)=> {
   //SELECIONA VIAGEM A SER DELETADA
   const sql = `DELETE FROM viagem WHERE viagem_idcliente = '${id}' and id_viagem = ${viagem}`;
   //EXECUTA O DELETE NA TABELA VIAGEM
-  return await conn.query(sql) && res.redirect('http://localhost:3000/viagens') && res.json({mensagem: "viagem excluida com sucesso" });
+  return await conn.query(sql) && res.redirect('http://localhost:3000/') && res.json({mensagem: "viagem excluida com sucesso" });
+
+});
+//
+// app.get('/viagem/alterar' , async (req, res)=> {
+  
+//   return res.redirect('http://localhost:3000/alterarViagem')
+  
+// });
+
+//ALTERA VIAGEM
+app.post('/viagem/atualiza' , async (req, res)=> {
+    //ATRIBUINDO VALORES DA ROTA A VARIAVEL DATA
+   
+  
+  const conn = await conecta();//CONECTANDO AO BANDO DE DADOS
+  const sessao = await logado(); //IMPORTANDO DADOS DO USUARIO LOGADO
+  const id = sessao.idcliente; //ATRIBUINDO O ID DO USUARIO LOGADO A VARIAVEL ID
+
+  //RECEBENDO VALORES INFORMAS NO BODY(FRONTEND) REFERENCIADOS COM NAME PARA SEREM RECEBIDOS COM req.body.campoDesejao
+  const {viagem, horario, data, kg_max, espaco, km_percorrido,valor_km, veiculo, cidade_origem, cidade_destino} = req.body //tabela viagem
+
+console.log(horario, data, kg_max, espaco, km_percorrido,valor_km, veiculo, cidade_origem, cidade_destino)
+  //INSERE DADOS NA TABELA VIAGEM
+  const sql = `UPDATE viagem SET horario = '${horario}', data = '${data}', espaco = '${espaco}', kg_max = '${kg_max}', valor_km = '${valor_km}', distancia_perc = '${km_percorrido}', veiculo_id_veiculo = '${veiculo}', cidade_origem = '${cidade_origem}', cidade_destino = '${cidade_destino}' where viagem_idcliente = '${id}' AND id_viagem = '${viagem}'`;
+
+  //GRAVA OS DADOS NA RESPECTIVAS TABELAS CLIENTE E CLIENTE_END
+  return await conn.query(sql) && res.redirect('http://localhost:3000/') && res.json({message:"CADASTRO EFETUADO"})            
 
 });
 
+// app.post('/viagemid', async (req,res)=> {
+//   const {viagem} = req.body;
+  // const viagem = 12
+  // app.get('/viagemid2', (req,res)=>{
+  //   const viagem2 = {
+  //     id: viagem
+  //   }
+  //   console.log(viagem2)
+  //   return res.json(viagem2) && res.redirect('http://localhost:3000/alterarViagem')
+  // })
+  // return res.json({message:"ok"})
+
+// })

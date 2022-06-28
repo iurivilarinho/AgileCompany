@@ -1,0 +1,23 @@
+:root{
+    --Branco:#ffffff;
+    --Preto:#000000;
+    --BackgroundCard: #717171;
+    --BackgroundSite:#C4C4C4;
+    --Primaria-V:#633646;
+    --Primaria-L:#F3A32A;
+}
+.btn{
+    background-color: var(--Primaria-L);
+    color: var(--Branco);
+    padding: 7px 50px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: .5s;
+    font-size: 16px;
+    font-weight: 700;
+}
+.btn:hover{
+    color: var(--BackgroundCard);
+}

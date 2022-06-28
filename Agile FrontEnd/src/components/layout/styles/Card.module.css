@@ -1,0 +1,33 @@
+:root{
+    --Branco:#ffffff;
+    --Preto:#000000;
+    --BackgroundCard: #717171;
+    --BackgroundSite:#C4C4C4;
+    --Primaria-V:#633646;
+    --Primaria-L:#F3A32A;
+}
+
+/* card principal */
+.cardPrincipal{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    border-radius: 20px;
+    max-width: 70vw;
+}
+.cardRed{
+    background-color: var(--Primaria-V);
+    box-shadow: 5px 5px rgba(0, 0, 0, 0.15);
+    margin-top: 30px;
+}
+.cardDarkGray{
+    background-color: var(--BackgroundCard);
+    box-shadow: 5px 5px rgba(0, 0, 0, 0.15);
+    margin-top: 30px;
+}
+.cardLightGray{
+    background-color: var(--BackgroundSite);
+    box-shadow: 5px 5px rgba(0, 0, 0, 0.15);
+    margin-top: 30px;
+}
